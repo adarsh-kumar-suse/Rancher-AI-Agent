@@ -28,7 +28,7 @@ services:
       SCALE_DOWN_THRESHOLD: "0.25"
       CPU_PATCH_THRESHOLD: "1.10"
     volumes:
-      - ${KUBECONFIG_PATH:?set KUBECONFIG_PATH to your kubeconfig file}:/kubeconfig/config:ro
+      - /root/.kube/config:/kubeconfig/config:ro
     restart: unless-stopped
 
 volumes:
