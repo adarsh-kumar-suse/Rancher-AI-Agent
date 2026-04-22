@@ -1,0 +1,35 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ./agent
+    container_name: rancher-aiops-agent
+    depends_on:
+      - ollama
+    ports:
+      - "8080:8080"
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3
+      KUBECONFIG_PATH: /kubeconfig/config
+      TARGET_NAMESPACES: ""
+      DRY_RUN: "true"
+      MIN_REPLICAS: "1"
+      MAX_REPLICAS: "10"
+      SCALE_UP_THRESHOLD: "0.80"
+      SCALE_DOWN_THRESHOLD: "0.25"
+      CPU_PATCH_THRESHOLD: "1.10"
+    volumes:
+      - ${KUBECONFIG_PATH:?set KUBECONFIG_PATH to your kubeconfig file}:/kubeconfig/config:ro
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
